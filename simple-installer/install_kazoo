@@ -644,8 +644,9 @@ yum_loop(){
     pack="$1"
     ret=0
     while read line; do
-        echo -en "\r${ceol}$line"         
-    done < <(yum -y install --downloadonly --downloaddir=/root $pack |& log_print || ret=1  )
+        echo -en "\r${ceol}$line" 
+        mkdir -p /root/rpm
+    done < <(yum -y install --downloaddir=/root/rpm $pack |& log_print || ret=1  )
     echo
    
     return $ret   
