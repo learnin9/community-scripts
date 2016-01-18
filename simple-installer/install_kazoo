@@ -647,7 +647,8 @@ yum_loop(){
         echo -en "\r${ceol}$line" 
     mkdir -p /root/rpm
 #    yum -y install yum-downloadonly
-    done < <(yum -y install --downloaddir=/root/rpm $pack |& log_print || ret=1  )
+#    done < <(yum -y install --downloaddir=/root/rpm $pack |& log_print || ret=1  )
+     done < <(yum -y install  $pack |& log_print || ret=1  )
     echo
    
     return $ret   
