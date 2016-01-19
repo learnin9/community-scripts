@@ -1,11 +1,82 @@
 #!/usr/bin/env bash
 KAZOO_WEB="http://downcc.ucserver.org:8082/RPMS/kazoo.rpms.tar.gz"
+
+set_hostname(){
+    #warn user and get permission to delete database information
+    dbg "Checking system for fully qualified hostname (FQDN)"
+
+    fqdn=""
+
+    current_system_hostname=$(hostname -f || echo unknown)
+    dbg "Current system hostname is $current_system_hostname"
+    
+    check_re $current_system_hostname $hostname_check_re
+
+    if [ $? -eq 0 ];then
+        return
+    else
+        warn "This system has hostname ${red}$current_system_hostname"
+        warn "This is not a fuly qualified domain name!"
+        warn "This must be a valid FQDN for kazoo to work properly."
+        warn "example FQDN: test.2600hz.com" 
+        warn "Please set a fully qualified domain name for the hostname."
+        warn "Upon completion of this step a system reboot is recommended"
+    fi
+
+    if [[ ${system_hostname:-} ]];then
+        echo "Setting system_hostname to $system_hostname"
+        fqdn=$system_hostname
+    else
+      valid=false
+      while [ $valid == false ]
+      do
+          info "Please enter fully qualified domain name (FQDN) for this server: "
+          read fqdn
+          
+          [[ ! ${fqdn:-} ]] && continue
+
+          check_re $fqdn $hostname_check_re
+        
+          if [ $? -eq 0 ];then
+              valid=true
+          else
+              error "You have entered an invalid FQDN: $fqdn\n"
+          fi
+      done
+    fi
+
+    #set the new hostname
+    hostname $fqdn
+
+    shortname=${fqdn%%\.*}
+    
+    sed -i "s/^127.0.0.1 .*/127.0.0.1  $fqdn $shortname localhost localhost.localdomain localhost4 localhost4.localdomain4/" /etc/hosts
+    sed -i "s/^::1 .*/::1  $fqdn $shortname localhost localhost.localdomain localhost6 localhost6.localdomain6/" /etc/hosts
+    sed -i "s/HOSTNAME=.*/HOSTNAME=$fqdn/g" /etc/sysconfig/network
+    echo "$fqdn" > /etc/hostname
+    
+    #if we are not auto-pilot, ask user if it is ok to reboot
+    if ! [[  ${all_in_one} ]];then 
+        local answer=""
+		confirm  "Do you want to reboot(optional)? [y|n]"
+        [[ ${answer:-} =~ [nN] ]] && return
+
+        warn "Rebooting system due to hostname change, brb!"
+        clear_lock
+        reboot 
+        exit
+    fi
+
+}
+
 kazoo_packages{
   cd /usr/src
   if [ ! -e ./kazoo.tar.gz ]; then
 			wget $KAZOO_WEB
   fi;
 }
+
+set_hostname
 kazoo_packages
 /opt/kazoo_install/setup_packages -a -i bigcouch -i rabbitmq -i haproxy -i kazoo -i freeswitch -i kamailio -i monster-ui
 
