@@ -4,7 +4,7 @@ kazoo_packages{
   cd /usr/src
   if [ ! -e ./kazoo.tar.gz ]; then
 			wget $KAZOO_WEB
-		fi;
+  fi;
 }
 kazoo_packages
 /opt/kazoo_install/setup_packages -a -i bigcouch -i rabbitmq -i haproxy -i kazoo -i freeswitch -i kamailio -i monster-ui
