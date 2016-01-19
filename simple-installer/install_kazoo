@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-KAZOO_WEB="http://downcc.ucserver.org:8082/RPMS/kazoo.tar.gz"
+KAZOO_WEB="http://downcc.ucserver.org:8082/RPMS/kazoo.rpms.tar.gz"
 kazoo_packages{
   cd /usr/src
   if [ ! -e ./kazoo.tar.gz ]; then
