@@ -71,10 +71,10 @@ set_hostname(){
 
 kazoo_packages{
   cd /usr/src
-  if [ ! -e ./kazoo.rpm.tar.gz ]; then
+  if [ ! -e ./kazoo.rpms.tar.gz ]; then
 	wget $KAZOO_WEB
   fi;
-  tar -xvzf kazoo.rpm.tar.gz
+  tar -xvzf kazoo.rpms.tar.gz
   yum -y install *.rpm
 }
 
