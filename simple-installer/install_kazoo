@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-kazoo_package{
-	
+
+kazoo_packages{
 }
+kazoo_packages
 /opt/kazoo_install/setup_packages -a -i bigcouch -i rabbitmq -i haproxy -i kazoo -i freeswitch -i kamailio -i monster-ui
 
 
